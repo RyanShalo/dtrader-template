@@ -72,21 +72,10 @@
             }
         </script>
         <!-- End theme styles and mobile app loader control -->
-        <!-- Start Anti-Clickjack -->
-        <style id="antiClickjack">
-            body {
-                display: none !important;
-            }
-        </style>
-        <script type="text/javascript">
-            if (self === top) {
-                var antiClickjack = document.getElementById('antiClickjack');
-                antiClickjack.parentNode.removeChild(antiClickjack);
-            } else {
-                top.location = self.location;
-            }
-        </script>
-        <!-- End Anti-Clickjack -->
+        <!-- Anti-Clickjack disabled to allow embedding inside the quantumsynpro host.
+             Re-enable with an origin allow-list if this template is ever deployed
+             standalone. -->
+
 
         <noscript>Your browser does not support JavaScript!</noscript>
 
