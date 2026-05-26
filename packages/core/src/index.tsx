@@ -145,65 +145,6 @@ if (typeof window !== 'undefined' && window.self !== window.top) {
     document.documentElement.classList.add('host-embedded');
 }
 
-// ---------------------------------------------------------------------------
-// Content-height sync (iframe-only)
-// Reports the real document content height to the parent so the host can
-// resize the <iframe> to match. Lets the host page scroll naturally instead
-// of forcing an inner scrollbar.
-// ---------------------------------------------------------------------------
-const setupHeightSync = () => {
-    if (typeof window === 'undefined' || window.self === window.top) return;
-
-    let lastHeight = 0;
-    const sendHeight = () => {
-        const height = Math.max(
-            document.body?.scrollHeight ?? 0,
-            document.documentElement?.scrollHeight ?? 0,
-            document.body?.offsetHeight ?? 0,
-            document.documentElement?.offsetHeight ?? 0
-        );
-        if (height > 0 && height !== lastHeight) {
-            lastHeight = height;
-            try {
-                window.parent.postMessage(
-                    { type: 'DTRADER_HEIGHT', source: 'dtrader-iframe', height },
-                    '*'
-                );
-            } catch {
-                // parent not reachable — ignore
-            }
-        }
-    };
-
-    // Observe layout changes via ResizeObserver on the root element.
-    const Observer =
-        typeof ResizeObserver !== 'undefined' ? ResizeObserver : null;
-    if (Observer) {
-        const ro = new Observer(() => sendHeight());
-        const tryObserve = () => {
-            if (document.documentElement) ro.observe(document.documentElement);
-            if (document.body) ro.observe(document.body);
-        };
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', tryObserve, { once: true });
-        } else {
-            tryObserve();
-        }
-    }
-
-    // Cheap fallback: re-poll once per second to catch async render changes
-    // ResizeObserver misses (lazy chunks, transitions, etc.).
-    setInterval(sendHeight, 1000);
-
-    // First push as soon as DOM is parsed.
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', sendHeight, { once: true });
-    } else {
-        sendHeight();
-    }
-};
-setupHeightSync();
-
 const initApp = async () => {
     // For simplified authentication, we don't need to pass accounts to initStore
     // The authentication will be handled by temp-auth.js and client-store.js
