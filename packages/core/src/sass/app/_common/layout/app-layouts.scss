@@ -197,6 +197,41 @@ html.host-embedded {
     .account-header__logged-out {
         display: none !important;
     }
+
+    /* ----- Scrollable trader inside the iframe -----
+       The standalone template treats the trader as a no-scroll app shell
+       (height: 100vh, overflow: hidden on every wrapper). Inside the host
+       iframe we want the user to be able to scroll if the content is taller
+       than the iframe viewport, so override the no-scroll constraints.
+       Done host-embedded-only to avoid changing the standalone behavior. */
+    &,
+    body {
+        overflow-y: auto !important;
+        overflow-x: hidden;
+        height: auto !important;
+    }
+
+    .derivatives-trader {
+        overflow: visible !important;
+        height: auto !important;
+        min-height: 100vh;
+    }
+
+    .app-contents {
+        overflow-y: auto !important;
+        overflow-x: hidden;
+        height: auto !important;
+        min-height: 100vh;
+    }
+
+    .app-shell {
+        overflow: visible !important;
+        min-height: 100vh;
+
+        &__main-content {
+            overflow: visible !important;
+        }
+    }
 }
 
 /** @define contract */

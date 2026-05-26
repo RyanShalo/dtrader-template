@@ -1,0 +1,64 @@
+.positions-fab {
+    position: fixed;
+    right: 1.6rem;
+    bottom: 1.6rem;
+    z-index: 50;
+    width: 5.2rem;
+    height: 5.2rem;
+    border-radius: 50%;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--color-status-default);
+    box-shadow:
+        0 8px 24px rgba(0, 0, 0, 0.25),
+        0 2px 6px rgba(0, 0, 0, 0.18);
+    transition:
+        transform 0.15s ease,
+        box-shadow 0.18s ease,
+        background 0.18s ease;
+
+    &:hover {
+        transform: translateY(-2px);
+        box-shadow:
+            0 12px 28px rgba(0, 0, 0, 0.3),
+            0 4px 10px rgba(0, 0, 0, 0.22);
+    }
+
+    &:active {
+        transform: translateY(0);
+    }
+
+    &:focus-visible {
+        outline: 2px solid var(--color-status-default);
+        outline-offset: 3px;
+    }
+
+    /* keep on mobile but bring it in a bit so it doesn't sit under the
+       expanded trade-parameters bottom sheet */
+    @media (max-width: 768px) {
+        right: 1.2rem;
+        bottom: 30rem;
+        width: 4.8rem;
+        height: 4.8rem;
+    }
+
+    &__badge {
+        position: absolute;
+        top: -4px;
+        right: -4px;
+        min-width: 2rem;
+        height: 2rem;
+        padding: 0 0.5rem;
+        border-radius: 1rem;
+        background: var(--core-color-solid-red-500, #d33);
+        color: #fff;
+        font-size: 1.1rem;
+        font-weight: 700;
+        line-height: 2rem;
+        text-align: center;
+        box-shadow: 0 0 0 2px var(--color-surface-primary);
+    }
+}
