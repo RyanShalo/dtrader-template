@@ -176,6 +176,23 @@
     z-index: 9999;
 }
 
+/* ---------------------------------------------------------------------------
+   Host-embedded mode
+   Added by the trusted-host bootstrap (index.tsx → writeHostAuth) when the
+   app is loaded inside a host like quantumsynpro. Hides UI that the host
+   already renders above the iframe (account info, account switcher, deposit
+   / try-real button). The header bar itself stays so the trader still has
+   a clean top edge.
+   --------------------------------------------------------------------------- */
+html.host-embedded {
+    #dt_core_header_acc-info-container,
+    #dt_core_header_acc-info-preloader,
+    .acc-info__container,
+    .acc-info__preloader {
+        display: none !important;
+    }
+}
+
 /** @define contract */
 .contract {
     &--enter {

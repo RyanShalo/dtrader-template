@@ -59,6 +59,10 @@ const writeHostAuth = ({ access_token, expires_in = 3600, refresh_token, loginid
     // OAuth app (different client_id). The parent is responsible for
     // pushing a fresh access_token before the current one expires.
     sessionStorage.setItem('host_auth', 'true');
+    // CSS hook: lets stylesheets hide host-redundant UI (account switcher,
+    // deposit button, etc.) when the app is embedded inside a trusted host.
+    // Use documentElement because body may not exist yet during boot.
+    document.documentElement.classList.add('host-embedded');
     if (loginid) {
         sessionStorage.setItem('active_loginid', loginid);
         localStorage.setItem('active_loginid', loginid);
