@@ -27,10 +27,34 @@ const getHeaders = (includeContentType = true): HeadersInit => {
     };
 };
 
-/** Fetch wrapper: retries once with a refreshed token on 401. */
+/**
+ * Fetch wrapper: retries once with a refreshed token on 401.
+ *
+ * When the token was handed over by a trusted host (host_auth sentinel set
+ * by the bootstrap in index.tsx), refreshing here would call the fork's
+ * /oauth2/token endpoint with the fork's client_id — but the refresh_token
+ * belongs to the host's client_id, so the refresh would 401 too. Instead we
+ * notify the parent via postMessage and let it push a fresh access_token.
+ */
 const apiFetch = async (url: string, options: RequestInit = {}, includeContentType = true): Promise<Response> => {
     const res = await fetch(url, { ...options, headers: getHeaders(includeContentType) });
     if (res.status === 401) {
+        const isHostAuth = sessionStorage.getItem('host_auth') === 'true';
+        if (isHostAuth) {
+            // Ping the parent so it can refresh its OAuth session and re-post.
+            try {
+                window.parent?.postMessage(
+                    { type: 'TOKEN_EXPIRED', source: 'dtrader-iframe' },
+                    '*' // parent origin unknown at this layer; the parent itself filters
+                );
+            } catch {
+                // ignore — parent may not be reachable
+            }
+            // Return the 401 untouched. The parent's next postMessage will
+            // trigger a re-bootstrap via window.location.reload() in
+            // setupPostMessageAuth (see index.tsx).
+            return res;
+        }
         await refreshAccessToken();
         return fetch(url, { ...options, headers: getHeaders(includeContentType) });
     }
