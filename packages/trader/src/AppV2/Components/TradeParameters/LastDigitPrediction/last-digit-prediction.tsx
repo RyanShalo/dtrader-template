@@ -27,7 +27,9 @@ const getInvalidDigitForContractType = (trade_type_tab: string): number | null =
 const LastDigitPrediction = observer(({ is_minimized }: TTradeParametersProps) => {
     const store = useTraderStore();
     const { digit_stats = [], is_market_closed, last_digit, onChange, trade_type_tab } = store;
-    const [is_open, setIsOpen] = React.useState(false);
+    // Default open so digit-prediction drawer is visible immediately on mobile.
+    // User can close, and it won't reopen until they tap the field again.
+    const [is_open, setIsOpen] = React.useState(true);
     const [selected_digit, setSelectedDigit] = React.useState(last_digit);
     const [previous_trade_type_tab, setPreviousTradeTypeTab] = React.useState(trade_type_tab);
     const { addSnackbar } = useSnackbar();
