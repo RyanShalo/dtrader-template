@@ -137,6 +137,14 @@ const setupPostMessageAuth = () => {
 bootstrapTokenFromUrl();
 setupPostMessageAuth();
 
+// Mark ANY iframed context as embedded, even if no token was handed over
+// (e.g. user did the fork's own OAuth login inside the frame). The host
+// renders its own account UI above the iframe, so the duplicate header
+// content should be hidden in every embedded session.
+if (typeof window !== 'undefined' && window.self !== window.top) {
+    document.documentElement.classList.add('host-embedded');
+}
+
 const initApp = async () => {
     // For simplified authentication, we don't need to pass accounts to initStore
     // The authentication will be handled by temp-auth.js and client-store.js
