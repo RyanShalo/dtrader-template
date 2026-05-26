@@ -18,7 +18,9 @@ const SWIPE_THRESHOLD_PX = 50; // Minimum distance (px) to recognize as swipe vs
 
 const TradeParametersContainer = ({ is_market_closed }: TTradeParametersContainer) => {
     const { contract_type } = useTraderStore();
-    const [is_sheet_expanded, setIsSheetExpanded] = React.useState(false);
+    // Default open so duration/stake are visible immediately on mobile.
+    // User can swipe down or tap the handle to collapse it.
+    const [is_sheet_expanded, setIsSheetExpanded] = React.useState(true);
     const handle_touch_start_y = React.useRef<number>(0);
     const prev_contract_type_ref = React.useRef(contract_type);
     const is_swipe_ref = React.useRef(false);
