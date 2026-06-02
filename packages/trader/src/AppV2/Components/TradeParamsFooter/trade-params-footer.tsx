@@ -2,17 +2,14 @@ import React from 'react';
 
 import NetworkStatus from '@deriv/core/src/App/Components/Layout/Footer/network-status';
 
-import DateTime from './date-time';
-import ToggleFullScreen from './toggle-fullscreen';
-
 import './trade-params-footer.scss';
 
+// DateTime and ToggleFullScreen intentionally removed for the embedded/host
+// experience — the host frames the app and provides its own chrome.
 const TradeParamsFooter: React.FC = () => {
     return (
         <div className='trade-params-footer'>
             <NetworkStatus />
-            <DateTime />
-            <ToggleFullScreen showPopover={true} />
         </div>
     );
 };

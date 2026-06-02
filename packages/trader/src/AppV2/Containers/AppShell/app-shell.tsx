@@ -5,8 +5,6 @@ import { observer } from 'mobx-react-lite';
 import { routes } from '@deriv/shared';
 import { useStore } from '@deriv/stores';
 
-import PositionsFab from 'AppV2/Components/PositionsFab/positions-fab';
-
 import Router from '../../Routes/router';
 
 import './app-shell.scss';
@@ -22,16 +20,13 @@ const AppShell = observer(() => {
         }
     }, [location.pathname]);
 
-    // Only show the floating positions trigger on the trade page (matches the
-    // original sidebar's `sidebar__hidden` behavior).
-    const isOnTradeRoute = location.pathname === routes.index;
-
+    // PositionsFab (floating Open Positions trigger) intentionally removed —
+    // the host provides its own Open Positions tab.
     return (
         <div className='app-shell'>
             <div className='app-shell__main-content'>
                 <Router />
             </div>
-            {isOnTradeRoute && <PositionsFab />}
         </div>
     );
 });

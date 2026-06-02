@@ -276,6 +276,18 @@ const TradeTypes = ({ contract_type, onTradeTypeSelect, trade_types, is_dark_mod
         setIsOpen(true);
     };
 
+    // On desktop the chip row overflows horizontally but its scrollbar is
+    // hidden, so a vertical mouse wheel can't reach the off-screen chips.
+    // Translate vertical wheel delta into horizontal scroll.
+    const handleWheel = useCallback((e: React.WheelEvent<HTMLDivElement>) => {
+        const el = trade_types_ref.current;
+        if (!el || el.scrollWidth <= el.clientWidth) return;
+        const delta = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
+        if (delta === 0) return;
+        el.scrollLeft += delta;
+        e.preventDefault();
+    }, []);
+
     const isTradeTypeSelected = (value: string) =>
         checkContractTypePrefix([contract_type, value]) || contract_type === value;
 
@@ -341,7 +353,7 @@ const TradeTypes = ({ contract_type, onTradeTypeSelect, trade_types, is_dark_mod
     }
 
     return (
-        <div className='trade__trade-types' ref={trade_types_ref}>
+        <div className='trade__trade-types' ref={trade_types_ref} onWheel={handleWheel}>
             <TradeTypesSelector
                 available_contracts={AVAILABLE_CONTRACTS.filter(contract =>
                     trade_types.some(tt => contract.for.includes(tt.value))

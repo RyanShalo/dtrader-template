@@ -1270,9 +1270,8 @@ export default class TradeStore extends BaseStore {
                                 const contract_type_display = getTradeTypeName(contract_type) || '';
                             }
 
-                            if (!isMobile) {
-                                this.root_store.ui.openPositionsDrawer();
-                            }
+                            // Auto-opening the Open Positions drawer after a purchase is
+                            // disabled — the host provides its own Open Positions tab.
                             this.proposal_info = {};
                             this.forgetAllProposal();
                             this.purchase_info = response;

@@ -106,6 +106,56 @@ const bootstrapTokenFromUrl = () => {
     window.history.replaceState({}, document.title, cleanUrl);
 };
 
+// ---------------------------------------------------------------------------
+// Host-controlled theme
+//
+// The host that embeds this app decides the theme and tells the iframe, so the
+// trader matches the surrounding site. The iframe never guesses.
+//
+//   URL param:   ?theme=dark | ?theme=light
+//   postMessage: { type: 'SET_THEME', theme: 'dark' | 'light' }
+//
+// On boot we apply the class immediately (no flash) and remember the choice;
+// once the store is up we call ui.setDarkMode() so it persists and the normal
+// theme autorun keeps the body class in sync. The postMessage path lets the
+// host switch the theme at runtime without a reload.
+// ---------------------------------------------------------------------------
+let host_theme: 'dark' | 'light' | null = null;
+
+const applyThemeClass = (theme: 'dark' | 'light') => {
+    [document.documentElement, document.body].forEach(el => {
+        if (!el) return;
+        el.classList.remove('theme--dark', 'theme--light');
+        el.classList.add(theme === 'dark' ? 'theme--dark' : 'theme--light');
+    });
+};
+
+const normalizeTheme = (value: unknown): 'dark' | 'light' | null =>
+    value === 'dark' || value === 'light' ? value : null;
+
+const bootstrapThemeFromUrl = () => {
+    const theme = normalizeTheme(new URLSearchParams(window.location.search).get('theme'));
+    if (!theme) return;
+    host_theme = theme;
+    applyThemeClass(theme);
+};
+
+const setupPostMessageTheme = () => {
+    window.addEventListener('message', event => {
+        if (!event?.data || typeof event.data !== 'object') return;
+        if (event.data.type !== 'SET_THEME') return;
+        const theme = normalizeTheme(event.data.theme);
+        if (!theme) return;
+        host_theme = theme;
+        applyThemeClass(theme);
+        // If the store is already up, flip it there too so the choice persists.
+        ui_store_ref?.setDarkMode(theme === 'dark');
+    });
+};
+
+// Set once the store is created so the runtime SET_THEME handler can reach it.
+let ui_store_ref: { setDarkMode: (on: boolean) => void } | null = null;
+
 const setupPostMessageAuth = () => {
     window.addEventListener('message', event => {
         // event.origin is the parent's origin. In production you should
@@ -136,6 +186,9 @@ const setupPostMessageAuth = () => {
 // Run the URL bootstrap synchronously so initStore() below sees the token.
 bootstrapTokenFromUrl();
 setupPostMessageAuth();
+// Theme bootstrap — apply the host's theme class before React mounts.
+bootstrapThemeFromUrl();
+setupPostMessageTheme();
 
 // Mark ANY iframed context as embedded, even if no token was handed over
 // (e.g. user did the fork's own OAuth login inside the frame). The host
@@ -150,6 +203,14 @@ const initApp = async () => {
     // The authentication will be handled by temp-auth.js and client-store.js
     // initStore is now async to perform whoami check before WebSocket connection
     const root_store = await initStore(AppNotificationMessages);
+
+    // Expose the UI store to the runtime SET_THEME handler, and apply the
+    // host's theme (from the URL) now that the store exists so it persists
+    // and the theme autorun keeps the body class in sync.
+    ui_store_ref = root_store.ui;
+    if (host_theme) {
+        root_store.ui.setDarkMode(host_theme === 'dark');
+    }
 
     const wrapper = document.getElementById('derivatives_trader');
     if (wrapper) {
