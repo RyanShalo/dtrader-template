@@ -1,9 +1,7 @@
 import React from 'react';
 import classNames from 'classnames';
 
-import { DerivProductBrandLightDerivTraderLogoIcon } from '@deriv/quill-icons';
 import { observer, useStore } from '@deriv/stores';
-import { useDevice } from '@deriv-com/ui';
 
 import { AccountActions } from 'App/Components/Layout/Header';
 import { AccountsInfoLoader } from 'App/Components/Layout/Header/Components/Preloader';
@@ -14,8 +12,6 @@ const HeaderLegacy = observer(() => {
     const { is_logged_in, is_logging_in } = client;
     const { is_app_disabled, is_route_modal_on } = ui;
     const { addNotificationMessage, client_notifications, removeNotificationMessage } = notifications;
-
-    const { isMobile } = useDevice();
 
     const addUpdateNotification = () => addNotificationMessage(client_notifications?.new_version_available);
     const removeUpdateNotification = React.useCallback(
@@ -35,11 +31,7 @@ const HeaderLegacy = observer(() => {
             })}
         >
             <div className='header__menu-items'>
-                {isMobile && (
-                    <div className='header__logo'>
-                        <DerivProductBrandLightDerivTraderLogoIcon height='32px' width='32px' />
-                    </div>
-                )}
+                {/* Brand logo removed — header stays empty in the embedded experience. */}
                 {is_logging_in ? (
                     <div id='dt_core_header_acc-info-preloader' className='acc-info__preloader'>
                         <AccountsInfoLoader is_logged_in={is_logged_in} />
